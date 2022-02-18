@@ -45,3 +45,61 @@ impl Problem2 for Solution {
         }
     }
 }
+
+struct SolutionLoop;
+
+impl Problem2 for SolutionLoop {
+    fn add_two_numbers(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        let mut l1 = l1;
+        let mut l2 = l2;
+        let mut res: Vec<i32> = vec![];
+        let mut carried = false;
+
+        let mut next = loop {
+            match (l1, l2, carried) {
+                (Some(node1), Some(node2), _) => {
+                    let mut val = node1.val + node2.val;
+                    if carried {
+                        val += 1;
+                    }
+                    if val >= 10 {
+                        carried = true;
+                        val -= 10;
+                    } else {
+                        carried = false;
+                    }
+                    res.push(val);
+                    l1 = node1.next;
+                    l2 = node2.next;
+                }
+                (None, list, false) | (list, None, false) => {
+                    break list;
+                }
+                (None, None, true) => {
+                    res.push(1);
+                    break None;
+                }
+                (None, Some(node), true) | (Some(node), None, true) => {
+                    let mut val = node.val + 1;
+                    if val >= 10 {
+                        carried = true;
+                        val -= 10;
+                    } else {
+                        carried = false;
+                    }
+                    res.push(val);
+                    l1 = None;
+                    l2 = node.next;
+                }
+            }
+        };
+
+        for val in res.into_iter().rev() {
+            next = Some(Box::new(ListNode {val, next}));
+        }
+        next
+    }
+}
