@@ -11,43 +11,40 @@ struct Solution;
 
 impl Problem10 for Solution {
     fn is_match(s: String, p: String) -> bool {
-        fn is_match_iter(mut s: impl Iterator<Item=char> + Clone, mut p: impl Iterator<Item=char> + Clone) -> bool {
+        fn is_match_iter(
+            mut s: impl Iterator<Item = char> + Clone,
+            mut p: impl Iterator<Item = char> + Clone,
+        ) -> bool {
             loop {
                 match p.next() {
-                    Some('*') => {
-                        match p.next().unwrap() {
-                            '.' => {
-                                while !is_match_iter(s.clone(), p.clone()) {
-                                    match s.next() {
-                                        Some(_) => {}
-                                        _ => return false,
-                                    }
+                    Some('*') => match p.next().unwrap() {
+                        '.' => {
+                            while !is_match_iter(s.clone(), p.clone()) {
+                                match s.next() {
+                                    Some(_) => {}
+                                    _ => return false,
                                 }
-                                return true;
                             }
-                            ch => {
-                                while !is_match_iter(s.clone(), p.clone()) {
-                                    match s.next() {
-                                        Some(ch_) if ch_ == ch => {}
-                                        _ => return false,
-                                    }
+                            return true;
+                        }
+                        ch => {
+                            while !is_match_iter(s.clone(), p.clone()) {
+                                match s.next() {
+                                    Some(ch_) if ch_ == ch => {}
+                                    _ => return false,
                                 }
-                                return true;
                             }
+                            return true;
                         }
-                    }
-                    Some('.') => {
-                        match s.next() {
-                            Some(_) => {}
-                            _ => return false,
-                        }
-                    }
-                    Some(ch) => {
-                        match s.next() {
-                            Some(ch_) if ch_ == ch => {}
-                            _ => return false,
-                        }
-                    }
+                    },
+                    Some('.') => match s.next() {
+                        Some(_) => {}
+                        _ => return false,
+                    },
+                    Some(ch) => match s.next() {
+                        Some(ch_) if ch_ == ch => {}
+                        _ => return false,
+                    },
                     None => return matches!(s.next(), None),
                 }
             }
@@ -57,7 +54,6 @@ impl Problem10 for Solution {
     }
 }
 
-
 struct SolutionDP;
 
 impl Problem10 for SolutionDP {
@@ -65,36 +61,52 @@ impl Problem10 for SolutionDP {
         let p = p.chars().collect::<Vec<_>>();
         let plen = p.len();
 
-        let mut dp = vec![false; p.len()+1];
+        // dp[i] := p[..i] match s[..n]
+        let mut dp = vec![false; p.len() + 1];
+
+        // rules:
+        //   is_match("", "")
+        //   !is_match("", p + "c")
+        //   !is_match("", p + ".")
+        //   !is_match(s + "c", "")
+        //   is_match(s, p)  =>  is_match(s + "c", p + "c")
+        //   is_match(s, p)  =>  is_match(s + "c", p + ".")
+        //   is_match(s, p)  =>  is_match(s, p + "c*")  // c* match nothing
+        //   is_match(s, p)  =>  is_match(s, p + ".*")  // .* match nothing
+        //   is_match(s, p + "c")  =>  is_match(s, p + "c*")  // c* match c
+        //   is_match(s, p + ".")  =>  is_match(s, p + ".*")  // .* match .
+        //   is_match(s, p + "c*")  =>  is_match(s + "c", p + "c*")  // c* match c+
+        //   is_match(s, p + ".*")  =>  is_match(s + "c", p + ".*")  // .* match .+
 
         // match empty string
         dp[0] = true;
         for (i, a) in p.iter().enumerate() {
-            match a {
-                '*' => dp[i+1] = dp[i-1],
-                _ => dp[i+1] = false,
+            dp[i + 1] = match a {
+                '*' => dp[i - 1],
+                _ => false,
+            };
+        }
+
+        let mut dp_prev = vec![false; p.len() + 1];
+        for ch in s.chars() {
+            // match `ch` additionally
+            std::mem::swap(&mut dp_prev, &mut dp);
+            dp[0] = false;
+            for i in 0..plen {
+                dp[i + 1] = if p[i] == '*' {
+                    if p[i - 1] == ch || p[i - 1] == '.' {
+                        dp[i - 1] || dp[i] || dp_prev[i + 1]
+                    } else {
+                        dp[i - 1] || dp[i]
+                    }
+                } else if p[i] == ch || p[i] == '.' {
+                    dp_prev[i]
+                } else {
+                    false
+                };
             }
         }
 
-        for ch in s.chars() {
-            // match `ch` additionally
-            let dp_prev = dp.clone();
-            dp[0] = false;
-            for (i, a) in p.iter().enumerate() {
-                match a {
-                    '*' => {
-                        dp[i+1] = dp[i-1] || dp[i];
-                        if ch == p[i-1] || '.' == p[i-1] {
-                            dp[i+1] = dp[i+1] || dp_prev[i+1];
-                        }
-                    }
-                    '.' => dp[i+1] = dp_prev[i],
-                    a if a == &ch => dp[i+1] = dp_prev[i],
-                    _ => dp[i+1] = false,
-                }
-            }
-        }
-        
         dp[plen]
     }
 }
