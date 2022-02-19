@@ -30,7 +30,7 @@ impl Problem5 for Solution {
     }
 }
 
-pub struct ManacherAlgorithm;
+struct ManacherAlgorithm;
 
 impl Problem5 for ManacherAlgorithm {
     fn longest_palindrome(s: String) -> String {
