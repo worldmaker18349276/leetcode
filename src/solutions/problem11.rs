@@ -18,26 +18,13 @@ impl Problem11 for Solution {
         let mut width = height.len() - 1;
         let mut area = 0;
         while width > 0 {
-            let mut threshold = &0;
+            area = area.max(left.min(right) * width as i32);
             if left <= right {
-                while width > 0 && left <= right {
-                    if left > threshold {
-                        threshold = left;
-                        area = area.max(left.min(right) * width as i32);
-                    }
-                    left = forward.next().unwrap();
-                    width -= 1;
-                }
+                left = forward.next().unwrap();
             } else {
-                while width > 0 && right <= left {
-                    if right > threshold {
-                        threshold = right;
-                        area = area.max(right.min(left) * width as i32);
-                    }
-                    right = backward.next().unwrap();
-                    width -= 1;
-                }
+                right = backward.next().unwrap();
             }
+            width -= 1;
         }
         area
     }
