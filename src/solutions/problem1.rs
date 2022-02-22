@@ -21,6 +21,22 @@ impl Problem1 for Solution {
     }
 }
 
+struct SolutionIter;
+
+impl Problem1 for SolutionIter {
+    fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+        let mut iter1 = nums.iter().enumerate();
+        while let Some((i, a)) = iter1.next() {
+            for (j, b) in iter1.clone() {
+                if a + b == target {
+                    return vec![i as i32, j as i32];
+                }
+            }
+        }
+        panic!("no answer!");
+    }
+}
+
 struct SolutionFast;
 
 impl Problem1 for SolutionFast {
