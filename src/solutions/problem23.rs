@@ -16,31 +16,26 @@ struct Solution;
 
 impl Problem23 for Solution {
     fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
-        fn vec_update<T, F>(list: &mut Vec<T>, index: usize, f: F)
-        where
-            F: FnOnce(T) -> T,
-        {
-            let element = list.remove(index);
-            let element = f(element);
-            list.insert(index, element);
+        fn update_and_return<T, U>(var: &mut T, f: impl FnOnce(T) -> (T, U)) -> U where T: Default {
+            let mut old = T::default();
+            std::mem::swap(var, &mut old);
+            let (new, res) = f(old);
+            *var = new;
+            res
         }
 
         let mut lists = lists;
         if lists.iter().all(Option::is_none) {
             None
         } else {
-            let index = lists
-                .iter()
-                .enumerate()
-                .max_by_key(|(_, list)| list.as_ref().map(|node| -node.val))
-                .unwrap()
-                .0;
+            let list = lists
+                .iter_mut()
+                .max_by_key(|list| list.as_ref().map(|node| -node.val))
+                .unwrap();
 
-            let mut value = 0;
-            vec_update(&mut lists, index, |node| {
+            let value = update_and_return(list, |node| {
                 let ListNode { val, next } = *node.unwrap();
-                value = val;
-                next
+                (next, val)
             });
 
             Some(Box::new(ListNode {
