@@ -10,12 +10,14 @@ struct Solution;
 impl Problem14 for Solution {
     fn longest_common_prefix(strs: Vec<String>) -> String {
         let len = strs.iter().map(String::len).min().unwrap();
-        let s0 = &strs[0];
-        for i in 0..len {
-            if strs.iter().any(|s| s[i..i+1] != s0[i..i+1]) {
-                return s0[..i].to_string();
+        let strs: Vec<Vec<_>> = strs.iter().map(|s| s.chars().collect()).collect();
+        let str0 = &strs[0][..len];
+        let strs = &strs[1..];
+        for (i, c0) in str0.iter().enumerate() {
+            if strs.iter().any(|s| &s[i] != c0) {
+                return str0[..i].iter().collect();
             }
         }
-        s0[..len].to_string()
+        str0.iter().collect()
     }
 }
