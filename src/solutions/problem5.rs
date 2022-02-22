@@ -69,43 +69,45 @@ impl Problem5 for ManacherAlgorithm {
             chars.push(c);
         }
         chars.push('#');
+        chars.push('$');
         let len = chars.len();
 
-        let mut res = 0;
+        let mut max_center = 0;
 
-        let mut p = vec![0; len];
-        let mut c = 0;
-        let mut r = 0;
+        let mut res = vec![0; len];
+        let mut center = 0;
+        let mut boundary = 0;
 
-        // 0 <= 2*c-r <= c <= i <= r
-        // p[c] == r - c
+        // 0 <= 2*center-boundary <= center <= i <= boundary
+        // res[center] == boundary - center
 
-        for i in 0..len {
-            if i > r {
-                c = i;
-                r = i;
+        for index in 0..len {
+            if index > boundary {
+                center = index;
+                boundary = index;
             }
-            let i_ = 2 * c - i;
-            match p[i_].cmp(&(r - i)) {
-                std::cmp::Ordering::Less => p[i] = p[i_],
-                std::cmp::Ordering::Greater => p[i] = r - i,
+            let index_ = 2 * center - index;
+            match res[index_].cmp(&(boundary - index)) {
+                std::cmp::Ordering::Less => res[index] = res[index_],
+                std::cmp::Ordering::Greater => res[index] = boundary - index,
                 std::cmp::Ordering::Equal => {
-                    p[i] = r - i;
-                    let mut r_ = 2 * i - r;
-                    while r < len - 1 && r_ > 0 && chars[r_ - 1] == chars[r + 1] {
-                        p[i] += 1;
-                        r_ -= 1;
-                        r += 1;
+                    center = index;
+                    res[center] = boundary - center;
+                    let mut boundary_ = 2 * center - boundary;
+                    while chars.get(boundary_ - 1) == chars.get(boundary + 1) {
+                        // assert!(chars.get(boundary_ - 1).is_some() && chars.get(boundary + 1).is_some());
+                        res[center] += 1;
+                        boundary_ -= 1;
+                        boundary += 1;
                     }
-                    c = i;
-                    if p[i] > p[res] {
-                        res = i;
+                    if res[center] > res[max_center] {
+                        max_center = center;
                     }
                 }
             }
         }
 
-        chars[res - p[res]..=res + p[res]]
+        chars[max_center - res[max_center]..=max_center + res[max_center]]
             .iter()
             .filter(|ch| ch != &&'#')
             .collect()
