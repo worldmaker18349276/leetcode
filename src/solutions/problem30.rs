@@ -90,3 +90,71 @@ impl Problem30 for SolutionOverpower {
         res
     }
 }
+
+struct Solution;
+
+impl Problem30 for Solution {
+    fn find_substring(s: String, words: Vec<String>) -> Vec<i32> {
+        use std::collections::HashMap;
+
+        let s = s.as_bytes();
+        let str_len = s.len();
+        let word_len = words[0].len();
+        let word_nums = words.len();
+        let total_len = word_len * word_nums;
+
+        if total_len > str_len {
+            return vec![];
+        }
+
+        let dict = {
+            let mut dict = HashMap::new();
+            let mut index = 0;
+            for word in words.iter().map(String::as_bytes) {
+                let entry = dict.entry(word).or_insert_with(|| {
+                    index += 1;
+                    (index, 0)
+                });
+                (*entry).1 += 1;
+            }
+            dict
+        };
+
+        let mut res = Vec::new();
+
+        for offset in 0..word_len {
+            let offset_end = offset + (str_len - offset) / word_len * word_len;
+            let mut reached = vec![0; word_nums];
+            for (pos, word) in s[offset..offset_end].chunks(word_len).enumerate() {
+                if let Some(&(index, count)) = dict.get(word) {
+                    reached[pos % word_nums] = index;
+                    let finished = {
+                        let mut finished = true;
+                        let mut reached_count = 0;
+                        for n in (1..word_nums+1).rev() {
+                            let n = (pos + n) % word_nums;
+                            if reached[n] == index {
+                                reached_count += 1;
+                            }
+                            if reached_count > count {
+                                reached[n] = 0;
+                            }
+                            if reached[n] == 0 {
+                                finished = false;
+                                break;
+                            }
+                        }
+                        finished
+                    };
+                    if finished {
+                        res.push((offset + (pos + 1) * word_len - total_len) as i32);
+                    }
+                } else {
+                    reached[pos % word_nums] = 0;
+                }
+            }
+        }
+
+        res
+    }
+}
