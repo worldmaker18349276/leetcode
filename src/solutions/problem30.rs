@@ -7,10 +7,13 @@ pub trait Problem30 {
     fn find_substring(s: String, words: Vec<String>) -> Vec<i32>;
 }
 
-struct Solution;
+struct SolutionOverpower;
 
-impl Problem30 for Solution {
+impl Problem30 for SolutionOverpower {
     fn find_substring(s: String, words: Vec<String>) -> Vec<i32> {
+        use std::collections::HashMap;
+        use std::mem::replace;
+
         #[derive(Clone)]
         struct Tree<T>(Vec<(T, Tree<T>)>);
 
@@ -25,58 +28,65 @@ impl Problem30 for Solution {
         }
 
         impl<T: Eq> Tree<T> {
-            fn trim(&mut self, which: &T) {
-                let mut index = 0;
-                while index < self.0.len() {
-                    if &self.0[index].0 == which {
-                        self.0.swap_remove(index);
-                    } else {
-                        index += 1;
+            fn trim(&mut self, which: &T, count: usize) {
+                // debug_assert!(count > 0);
+                if count == 1 {
+                    let mut index = 0;
+                    while index < self.0.len() {
+                        if &self.0[index].0 == which {
+                            self.0.swap_remove(index);
+                        } else {
+                            index += 1;
+                        }
                     }
-                }
-                for (_, node) in self.0.iter_mut() {
-                    node.trim(which);
+                    for (_, node) in self.0.iter_mut() {
+                        node.trim(which, count);
+                    }
+                } else {
+                    for (value, node) in self.0.iter_mut() {
+                        let count = if value == which { count - 1 } else { count };
+                        node.trim(which, count);
+                    }
                 }
             }
         }
 
         let s = s.as_bytes();
-        let words_and_lens: Vec<_> = words
-            .iter()
-            .map(|s| s.as_bytes())
-            .map(|b| (b, b.len()))
+        let str_len = s.len();
+        let mut dict = HashMap::new();
+        for word in words.iter().map(String::as_bytes) {
+            let entry = dict.entry(word).or_insert_with(|| (word.len(), 0));
+            (*entry).1 += 1;
+        }
+        let dict: Vec<_> = dict
+            .into_iter()
+            .map(|(word, (len, count))| (word, len, count))
             .collect();
-        let total_len: usize = words_and_lens.iter().map(|(_, len)| len).sum();
-        let max_len: usize = *words_and_lens.iter().map(|(_, len)| len).max().unwrap();
-        let mut reached: Vec<Tree<usize>> = (0..max_len).map(|_| Tree::new()).collect();
+
+        let word_nums: usize = dict.iter().map(|(_, _, count)| count).sum();
+        let total_len: usize = dict.iter().map(|(_, len, count)| len * count).sum();
+        let max_len = *dict.iter().map(|(_, len, _)| len).max().unwrap();
+
+        let mut reached: Vec<Tree<_>> = (0..max_len).map(|_| Tree::new()).collect();
         let mut res = Vec::new();
 
-        for pos in 0..s.len() {
-            let tree = reached[pos % max_len].clone();
-            reached[pos % max_len] = Tree::new();
-            if tree.depth() == words.len() {
+        for pos in 0..str_len {
+            let tree = replace(&mut reached[pos % max_len], Tree::new());
+            if tree.depth() == word_nums {
                 res.push((pos - total_len) as i32);
             }
-            for (index, (word, len)) in words_and_lens.iter().enumerate() {
-                if pos + len <= s.len() && &&s[pos..pos + len] == word {
+            for (index, &(word, len, count)) in dict.iter().enumerate() {
+                if pos + len <= str_len && &s[pos..pos + len] == word {
                     let mut tree = tree.clone();
-                    tree.trim(&index);
+                    tree.trim(&index, count);
                     reached[(pos + len) % max_len].0.push((index, tree));
                 }
             }
         }
-        if reached[s.len() % max_len].depth() == words.len() {
-            res.push((s.len() - total_len) as i32);
+        if reached[str_len % max_len].depth() == word_nums {
+            res.push((str_len - total_len) as i32);
         }
 
         res
     }
-}
-
-#[test]
-fn t() {
-    let s = String::from("ababaab");
-    let words = vec!["ab","ba","ba"].into_iter().map(String::from).collect();
-    let solution = Solution::find_substring(s, words);
-    assert_eq!(solution, vec![1]);
 }
