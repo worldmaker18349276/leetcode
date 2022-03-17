@@ -1,5 +1,3 @@
-use std::slice::Iter;
-
 pub trait Problem46 {
     fn permute(nums: Vec<i32>) -> Vec<Vec<i32>>;
 }
