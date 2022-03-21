@@ -24,3 +24,19 @@ impl Problem49 for Solution {
         res
     }
 }
+
+struct SolutionHashMap;
+
+impl Problem49 for SolutionHashMap {
+    fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+        use std::collections::HashMap;
+
+        let mut res: HashMap<Vec<char>, Vec<String>> = HashMap::new();
+        for str in strs.into_iter() {
+            let mut key = str.chars().collect::<Vec<_>>();
+            key.sort_unstable();
+            res.entry(key).or_insert_with(Vec::new).push(str);
+        }
+        res.into_values().collect()
+    }
+}
