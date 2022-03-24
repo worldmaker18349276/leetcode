@@ -32,3 +32,33 @@ impl Problem50 for Solution {
         }
     }
 }
+
+struct SolutionLoop;
+
+impl Problem50 for SolutionLoop {
+    fn my_pow(x: f64, n: i32) -> f64 {
+        let mut x = x;
+        let mut n = n;
+        let mut res = 1.0;
+
+        if n < 0 {
+            x = 1.0 / x;
+            if n == i32::MIN {
+                res *= x;
+                n = i32::MAX;
+            } else {
+                n = -n;
+            }
+        }
+
+        while n != 0 {
+            if n % 2 == 1 {
+                res *= x;
+            }
+            x = x * x;
+            n = n / 2;
+        }
+
+        return res;
+    }
+}
