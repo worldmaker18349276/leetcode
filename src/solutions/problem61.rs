@@ -1,4 +1,4 @@
-pub trait Problem56 {
+pub trait Problem61 {
     fn rotate_right(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>>;
 }
 
@@ -21,7 +21,7 @@ impl ListNode {
 
 struct Solution;
 
-impl Problem56 for Solution {
+impl Problem61 for Solution {
     fn rotate_right(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
         fn length(mut head: &Option<Box<ListNode>>) -> usize {
             let mut len = 0;

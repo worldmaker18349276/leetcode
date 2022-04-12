@@ -1,10 +1,10 @@
-pub trait Problem54 {
+pub trait Problem59 {
     fn generate_matrix(n: i32) -> Vec<Vec<i32>>;
 }
 
 struct Solution;
 
-impl Problem54 for Solution {
+impl Problem59 for Solution {
     fn generate_matrix(n: i32) -> Vec<Vec<i32>> {
         let n = n as usize;
         let mut res = vec![vec![0; n]; n];

@@ -1,10 +1,10 @@
-pub trait Problem55 {
+pub trait Problem60 {
     fn get_permutation(n: i32, k: i32) -> String;
 }
 
 struct Solution;
 
-impl Problem55 for Solution {
+impl Problem60 for Solution {
     fn get_permutation(n: i32, k: i32) -> String {
         static CHARS: &[char] = &['1', '2', '3', '4', '5', '6', '7', '8', '9'];
         let n = n as usize;
@@ -29,7 +29,7 @@ impl Problem55 for Solution {
 
 struct SolutionCalc;
 
-impl Problem55 for SolutionCalc {
+impl Problem60 for SolutionCalc {
     fn get_permutation(n: i32, k: i32) -> String {
         static CHARS: &[char] = &['1', '2', '3', '4', '5', '6', '7', '8', '9'];
         let n = n as usize;
