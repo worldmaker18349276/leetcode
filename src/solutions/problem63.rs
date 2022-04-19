@@ -1,10 +1,10 @@
-pub trait Problem62 {
+pub trait Problem63 {
     fn unique_paths_with_obstacles(obstacle_grid: Vec<Vec<i32>>) -> i32;
 }
 
 struct Solution;
 
-impl Problem62 for Solution {
+impl Problem63 for Solution {
     fn unique_paths_with_obstacles(obstacle_grid: Vec<Vec<i32>>) -> i32 {
         let len = obstacle_grid[0].len();
         let mut p = vec![0; len];
