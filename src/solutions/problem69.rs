@@ -6,30 +6,28 @@ struct Solution;
 
 impl Problem69 for Solution {
     fn my_sqrt(x: i32) -> i32 {
-        if x == 0 {
-            return 0;
-        }
-        if x == 1 {
-            return 1;
-        }
+        // x <= 2^31 - 1
+        let m = 46340;
+        let mut c = 31;
+        let mut y = 0;
 
-        let len = {
-            let mut len = 0;
-            let mut x_ = x;
-            while x_ != 0 {
-                x_ /= 2;
-                len += 1;
+        'a: while c > 0 {
+            for d in 0..c {
+                let r = y | (1<<d);
+                let r2 = r * r;
+                if r2 > x || r > m {
+                    if d == 0 {
+                        return y;
+                    }
+                    c = d - 1;
+                    y |= 1<<c;
+                    continue 'a;
+                }
             }
-            len
-        };
-
-        for y in (1<<(len/2-1)).. {
-            let yy = y * y;
-            if yy > x || yy < 0 {
-                return y-1;
-            }
+            c -= 1;
+            y |= 1<<c;
         }
 
-        panic!()
+        y
     }
 }
