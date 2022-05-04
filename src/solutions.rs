@@ -73,3 +73,4 @@ pub mod problem72;
 pub mod problem73;
 pub mod problem74;
 pub mod problem75;
+pub mod problem76;
