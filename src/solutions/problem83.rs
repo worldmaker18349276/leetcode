@@ -41,7 +41,7 @@ impl Problem83 for SolutionTailCall {
             if let Some(node) = head {
                 let val = node.val;
                 if val == prev {
-                    *head = std::mem::take(&mut node.next);
+                    *head = node.next.take();
                     go(val, head)
                 } else {
                     go(val, &mut node.next)
@@ -65,7 +65,7 @@ impl Problem83 for SolutionLoop {
 
         while let Some(node) = curr.as_mut() {
             if val == node.val {
-                *curr = std::mem::take(&mut node.next);
+                *curr = node.next.take();
             } else {
                 val = node.val;
                 curr = &mut node.next;
