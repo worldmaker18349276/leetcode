@@ -33,6 +33,28 @@ impl Problem83 for Solution {
     }
 }
 
+struct SolutionTailCall;
+
+impl Problem83 for SolutionTailCall {
+    fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        fn go(prev: i32, head: &mut Option<Box<ListNode>>) {
+            if let Some(node) = head {
+                let val = node.val;
+                if val == prev {
+                    *head = std::mem::take(&mut node.next);
+                    go(val, head)
+                } else {
+                    go(val, &mut node.next)
+                }
+            }
+        }
+
+        let mut head = head;
+        go(i32::MAX, &mut head);
+        head
+    }
+}
+
 struct SolutionLoop;
 
 impl Problem83 for SolutionLoop {
