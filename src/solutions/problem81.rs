@@ -1,10 +1,10 @@
-pub trait Problem80 {
+pub trait Problem81 {
     fn search(nums: Vec<i32>, target: i32) -> bool;
 }
 
 struct Solution;
 
-impl Problem80 for Solution {
+impl Problem81 for Solution {
     fn search(nums: Vec<i32>, target: i32) -> bool {
         let left_index = 0;
         let right_index = nums.len() - 1;
