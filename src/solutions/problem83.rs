@@ -33,3 +33,24 @@ impl Problem83 for Solution {
     }
 }
 
+struct SolutionLoop;
+
+impl Problem83 for SolutionLoop {
+    fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut head = head;
+        let mut curr = &mut head;
+        let mut val = i32::MAX;
+
+        while let Some(node) = curr.as_mut() {
+            if val == node.val {
+                *curr = std::mem::take(&mut node.next);
+            } else {
+                val = node.val;
+                curr = &mut node.next;
+            }
+        }
+
+        head
+    }
+}
+
