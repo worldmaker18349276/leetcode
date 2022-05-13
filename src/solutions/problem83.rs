@@ -55,24 +55,24 @@ impl Problem83 for SolutionTailCall {
     }
 }
 
-struct SolutionLoop;
+// struct SolutionLoop;
 
-impl Problem83 for SolutionLoop {
-    fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-        let mut head = head;
-        let mut curr = &mut head;
-        let mut val = i32::MAX;
+// impl Problem83 for SolutionLoop {
+//     fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+//         let mut head = head;
+//         let mut curr = &mut head;
+//         let mut val = i32::MAX;
 
-        while let Some(node) = curr.as_mut() {
-            if val == node.val {
-                *curr = node.next.take();
-            } else {
-                val = node.val;
-                curr = &mut node.next;
-            }
-        }
+//         while let Some(node) = curr.as_mut() {
+//             if val == node.val {
+//                 *curr = node.next.take();
+//             } else {
+//                 val = node.val;
+//                 curr = &mut node.next;
+//             }
+//         }
 
-        head
-    }
-}
+//         head
+//     }
+// }
 
