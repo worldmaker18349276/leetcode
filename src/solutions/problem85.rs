@@ -6,34 +6,39 @@ struct Solution;
 
 impl Problem85 for Solution {
     fn maximal_rectangle(matrix: Vec<Vec<char>>) -> i32 {
+        let n = matrix.len();
         let mut max = 0;
         let mut dp: Vec<Vec<(usize, usize)>> = vec![vec![]; matrix[0].len()];
 
         for (i, row) in matrix.into_iter().enumerate() {
             let mut filled = 0;
-            for (j, ch) in row.into_iter().enumerate() {
-                if ch == '0' {
-                    let y = j - filled;
-                    match dp[j].binary_search_by_key(&std::cmp::Reverse(y), |(_, y)| std::cmp::Reverse(*y)) {
+            for ((j, ch), dpj) in row.into_iter().enumerate().zip(dp.iter_mut()) {
+                if ch == '1' {
+                    let ym = j - filled;
+                    match dpj.binary_search_by_key(&std::cmp::Reverse(ym), |(_, y)| std::cmp::Reverse(*y)) {
                         Ok(n) => {
-                            dp[j].drain(n+1..);
+                            max = max.max(dpj.drain(n+1..).map(|(x, y)| (i - x) * (j - y + 1)).max().unwrap_or(0));
                         }
                         Err(n) => {
-                            if let Some(dpn) = dp[j].get_mut(n) {
-                                dpn.1 = y;
-                                dp[j].drain(n+1..);
+                            if let Some(xy) = dpj.get_mut(n) {
+                                max = max.max((i - xy.0) * (j - xy.1 + 1));
+                                xy.1 = ym;
+                                max = max.max(dpj.drain(n+1..).map(|(x, y)| (i - x) * (j - y + 1)).max().unwrap_or(0));
                             } else {
-                                dp[j].push((i, y));
+                                dpj.push((i, ym));
                             }
                         }
                     }
                     filled += 1;
                 } else {
-                    max = max.max(dp[j].drain(..).map(|(x, y)| (i - x + 1) * (j - y + 1)).max().unwrap_or(0));
+                    max = max.max(dpj.drain(..).map(|(x, y)| (i - x) * (j - y + 1)).max().unwrap_or(0));
                     filled = 0;
                 }
                 
             }
+        }
+        for (j, dpj) in dp.into_iter().enumerate() {
+            max = max.max(dpj.into_iter().map(|(x, y)| (n - x) * (j - y + 1)).max().unwrap_or(0));
         }
 
         max as i32
