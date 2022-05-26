@@ -55,24 +55,27 @@ impl Problem83 for SolutionTailCall {
     }
 }
 
-// struct SolutionLoop;
+struct SolutionLoop;
 
-// impl Problem83 for SolutionLoop {
-//     fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-//         let mut head = head;
-//         let mut curr = &mut head;
-//         let mut val = i32::MAX;
+impl Problem83 for SolutionLoop {
+    fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut head = head;
+        let mut curr = &mut head;
+        let mut val = i32::MAX;
 
-//         while let Some(node) = curr.as_mut() {
-//             if val == node.val {
-//                 *curr = node.next.take();
-//             } else {
-//                 val = node.val;
-//                 curr = &mut node.next;
-//             }
-//         }
+        while let Some(node) = curr.as_mut() {
+            if val == node.val {
+                *curr = node.next.take();
+            } else {
+                val = node.val;
+                // Instead of borrowing from `node`, borrow directly from `curr`.
+                // Otherwise the lifetime of `node` will be extended to the whole loop.
+                // curr = &mut node.next;
+                curr = &mut curr.as_mut().unwrap().next;
+            }
+        }
 
-//         head
-//     }
-// }
+        head
+    }
+}
 
